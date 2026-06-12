@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, toArray } from './client';
 
 export type Category = {
   categoryId: string;
@@ -42,7 +42,7 @@ const base = '/transaction/v1/categories';
 export const categoriesApi = {
   list: async () => {
     const { data } = await apiClient.get<Category[]>(base);
-    return data;
+    return toArray<Category>(data);
   },
   create: async (input: CreateCategoryInput) => {
     const { data } = await apiClient.post<Category>(base, input);
@@ -51,7 +51,10 @@ export const categoriesApi = {
   // Spec §3.3 — request body is a bare array of items, not wrapped in an object.
   bulkUpsert: async (items: BulkCategoryItem[]) => {
     const { data } = await apiClient.post<CategoryBulkResponse>(`${base}/bulk`, items);
-    return data;
+    return {
+      ...data,
+      categories: toArray<{ categoryId: string; name: string }>(data?.categories),
+    } as CategoryBulkResponse;
   },
   summary: async (id: string) => {
     const { data } = await apiClient.get<CategorySummary>(`${base}/${id}/summary`);

@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, toArray } from './client';
 
 export type EntryType = 'DEBIT' | 'CREDIT';
 export type TransactionSource = 'MANUAL' | 'BULK' | 'API';
@@ -111,7 +111,9 @@ export const transactionsApi = {
     const { data } = await apiClient.get<TransactionPage>(base, {
       params: serialiseListParams(params),
     });
-    return data;
+    // Guard the row array so a skewed/unexpected page shape can't crash the
+    // table with ".map is not a function".
+    return { ...data, data: toArray<Transaction>(data?.data) } as TransactionPage;
   },
   get: async (id: string) => {
     const { data } = await apiClient.get<Transaction>(`${base}/${id}`);
@@ -155,7 +157,7 @@ export const transactionsApi = {
     const { data } = await apiClient.get<BalancesResponse>(`${base}/balances`, {
       params: serialiseBalanceParams(params),
     });
-    return data;
+    return { ...data, balances: toArray<AccountBalance>(data?.balances) } as BalancesResponse;
   },
   counts: async () => {
     const { data } = await apiClient.get<CountsResponse>(`${base}/counts`);

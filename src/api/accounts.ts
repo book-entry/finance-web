@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, toArray } from './client';
 
 export type AccountType = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'EXPENSE' | 'REVENUE';
 export type AccountStatus = 'ACTIVE' | 'CLOSED';
@@ -42,7 +42,7 @@ const base = '/account/v1/accounts';
 export const accountsApi = {
   list: async (params?: { status?: AccountStatus; type?: AccountType }) => {
     const { data } = await apiClient.get<Account[]>(base, { params });
-    return data;
+    return toArray<Account>(data);
   },
   get: async (id: string) => {
     const { data } = await apiClient.get<Account>(`${base}/${id}`);

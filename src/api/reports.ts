@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, toArray } from './client';
 
 /** Mirrors `ReportsSummaryResponse.range` on the backend (REQ-reports-summary §2.1). */
 export type ReportsRange = 'month' | 'year';
@@ -60,7 +60,14 @@ export const reportsApi = {
     const { data } = await apiClient.get<ReportsSummary>(`${base}/summary`, {
       params: serialiseSummaryParams(params),
     });
-    return data;
+    // Guard each list field so an unexpected shape can't crash the report cards.
+    return {
+      ...data,
+      spendByCategory: toArray<CategorySpend>(data?.spendByCategory),
+      incomeByMonth: toArray<MonthlyTotal>(data?.incomeByMonth),
+      spendByMonth: toArray<MonthlyTotal>(data?.spendByMonth),
+      topMerchants: toArray<MerchantSpend>(data?.topMerchants),
+    } as ReportsSummary;
   },
 };
 

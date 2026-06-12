@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, toArray } from './client';
 
 export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
@@ -37,6 +37,6 @@ export const bulkUploadApi = {
   /** Poll job state — returns terminal status when status is COMPLETED or FAILED. */
   status: async (jobId: string) => {
     const { data } = await apiClient.get<JobStatusResponse>(`${base}/${jobId}`);
-    return data;
+    return { ...data, errorRows: toArray<ErrorRow>(data?.errorRows) } as JobStatusResponse;
   },
 };

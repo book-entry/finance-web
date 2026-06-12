@@ -14,6 +14,23 @@ function isPublicAuthPath(url: string | undefined): boolean {
   return PUBLIC_AUTH_PREFIXES.some((prefix) => url.startsWith(prefix));
 }
 
+/**
+ * Coerce a "list" response into an array. The backend contract is a bare JSON
+ * array, but tolerate the common envelope / pagination shapes ({@code {data:[]}},
+ * Spring's {@code {content:[]}}) so an unexpected wrapper from a skewed backend
+ * version degrades to an empty list instead of throwing
+ * "(x).map is not a function" and white-screening the app.
+ */
+export function toArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (value && typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    if (Array.isArray(obj.data)) return obj.data as T[];
+    if (Array.isArray(obj.content)) return obj.content as T[];
+  }
+  return [];
+}
+
 // In dev, leave VITE_API_BASE_URL unset — the Vite proxy forwards same-origin
 // requests to VITE_GATEWAY_URL. In production builds, set VITE_API_BASE_URL to
 // the gateway URL so the SPA can talk to it directly (requires CORS).
