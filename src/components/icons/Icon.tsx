@@ -164,6 +164,13 @@ export const Icon = {
       <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   ),
+  Menu: (p: IconProps) => (
+    <svg {...base(20)} strokeWidth={1.9} {...p}>
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  ),
 };
 
 export type IconKey = keyof typeof Icon;
