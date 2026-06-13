@@ -39,3 +39,12 @@ select {
   background: var(--primary-ring);
   color: var(--text);
 }
+
+/* Keep Ant Design dialogs inside the viewport on small screens — their
+   inline pixel width would otherwise overflow narrow phones. */
+@media (max-width: 560px) {
+  .ant-modal {
+    max-width: calc(100vw - 24px);
+    margin: 0 auto;
+  }
+}

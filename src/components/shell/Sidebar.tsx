@@ -13,11 +13,20 @@ function isActive(pathname: string, itemPath: string): boolean {
   return pathname === itemPath || pathname.startsWith(itemPath + '/');
 }
 
-function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
+function NavLink({
+  item,
+  pathname,
+  onNavigate,
+}: {
+  item: NavItem;
+  pathname: string;
+  onNavigate?: () => void;
+}) {
   const IconComp = NavIcon[item.icon];
   return (
     <Link
       to={item.path}
+      onClick={onNavigate}
       className={'nav-item' + (isActive(pathname, item.path) ? ' active' : '')}
     >
       <IconComp />
@@ -27,7 +36,14 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   );
 }
 
-export function Sidebar() {
+type SidebarProps = {
+  /** Extra class — used to toggle the open state of the mobile drawer. */
+  className?: string;
+  /** Called when a nav entry is activated, so the mobile drawer can close. */
+  onNavigate?: () => void;
+};
+
+export function Sidebar({ className = '', onNavigate }: SidebarProps = {}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -52,19 +68,37 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="sidebar" aria-label="Primary navigation">
+    <aside
+      className={'sidebar' + (className ? ' ' + className : '')}
+      aria-label="Primary navigation"
+    >
       <Brand />
       <div className="nav-section">Workspace</div>
       {WORKSPACE_NAV.map((item) => (
-        <NavLink key={item.id} item={item} pathname={pathname} />
+        <NavLink
+          key={item.id}
+          item={item}
+          pathname={pathname}
+          onNavigate={onNavigate}
+        />
       ))}
       <div className="nav-section">Account</div>
       {ACCOUNT_NAV.map((item) => (
-        <NavLink key={item.id} item={item} pathname={pathname} />
+        <NavLink
+          key={item.id}
+          item={item}
+          pathname={pathname}
+          onNavigate={onNavigate}
+        />
       ))}
       <div className="spacer" />
       <div className="user-card">
-        <Link to="/settings" className="user-link" aria-label="Open settings">
+        <Link
+          to="/settings"
+          className="user-link"
+          aria-label="Open settings"
+          onClick={onNavigate}
+        >
           <div className="avatar">{initials}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
