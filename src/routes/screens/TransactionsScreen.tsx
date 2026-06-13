@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Modal, Spin, message } from 'antd';
 import { Page } from '../../components/shell/Page';
 import { TopBar } from '../../components/shell/TopBar';
@@ -38,6 +39,7 @@ const PAGE_SIZE = 200;
 const SEARCH_DEBOUNCE_MS = 280;
 
 export function TransactionsScreen() {
+  const navigate = useNavigate();
   const accountId = useTxnFiltersStore((s) => s.accountId);
   const categoryFilter = useTxnFiltersStore((s) => s.categoryFilter);
   const search = useTxnFiltersStore((s) => s.search);
@@ -218,7 +220,11 @@ export function TransactionsScreen() {
         breadcrumb="All accounts"
         actions={
           <>
-            <button type="button" className="btn">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => navigate({ to: '/import' })}
+            >
               <Icon.Import /> Import
             </button>
             <button
